@@ -1,9 +1,9 @@
 const images = document.querySelectorAll('.js-image');
 
 var defaultTiltOpts = {
-	debounceTime: 100,
+	debounceTime: 18,
 	maxAngle: 25,
-	ignoreAngle: 0
+	ignoreAngle: 5
 };
 
 images.forEach(item => {
