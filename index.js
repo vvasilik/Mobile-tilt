@@ -7,25 +7,39 @@ var defaultTiltOpts = {
 };
 
 images.forEach(item => {
+	var sprite = {width: parseInt(item.dataset.width), height: parseInt(item.dataset.height)};
+	var mediaAsset = $(item);
+	var imageHeight = Math.round(item.getClientRects()[0].height);
+	var imageWidth = mediaAsset.width();
+	var sizeKoef = imageWidth / sprite.width;
+	var ratioImage = imageWidth / imageHeight;
+	var adaptedSpriteHeight = sprite.height * sizeKoef;
+	var sensativeAnle = 2 * (defaultTiltOpts.maxAngle - defaultTiltOpts.ignoreAngle);
+	var frameHeight = imageHeight * sizeKoef;
+	var numFrames = Math.floor(sprite.height / frameHeight);
+	var framesInOneAngle = numFrames / sensativeAnle;
+
+	init();
+
 	$(window).on('deviceorientation', throttledTilt.bind(this));
+
+	function init() {
+		tilt();
+	}
 
 	function throttledTilt(e) {
 		return _.debounce(tilt.call(this, e), defaultTiltOpts.debounceTime);
 	}
 
 	function tilt(e) {
+		if (!e) {
+			setOffset(getFloorOffset({
+				offset: adaptedSpriteHeight / 2
+			}));
 
-		var sprite = {width: parseInt(item.dataset.width), height: parseInt(item.dataset.height)};
-		var mediaAsset = $(item);
-		var imageHeight = item.getClientRects()[0].height;
-		var imageWidth = mediaAsset.width();
-		var sizeKoef = imageWidth / sprite.width;
-		var ratioImage = imageWidth / imageHeight;
-		var adaptedSpriteHeight = sprite.height * sizeKoef;
-		var sensativeAnle = 2 * (defaultTiltOpts.maxAngle - defaultTiltOpts.ignoreAngle);
-		var frameHeight = imageHeight * sizeKoef;
-		var numFrames = Math.floor(sprite.height / frameHeight);
-		var framesInOneAngle = numFrames / sensativeAnle;
+			return;
+		}
+
 		var gamma = e.originalEvent.gamma;
 		var tilt = gamma - this.initialAngle;
 		var absoluteTilt = Math.abs(tilt);
