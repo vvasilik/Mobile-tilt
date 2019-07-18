@@ -2,17 +2,16 @@ const DEBOUNCE_TIME = 18;
 const MAX_ANGLE = 25;
 
 const image = document.querySelector('.js-image');
-
-var sprite = {width: parseInt(image.dataset.width), height: parseInt(image.dataset.height)};
-var mediaAsset = $(image);
-var imageHeight = Math.round(image.getClientRects()[0].height);
-var imageWidth = mediaAsset.width();
-var sizeKoef = imageWidth / sprite.width;
-var adaptedSpriteHeight = sprite.height * sizeKoef;
-var sensativeAngle = 2 * MAX_ANGLE;
-var frameHeight = imageHeight * sizeKoef;
-var numFrames = Math.floor(sprite.height / frameHeight);
-var framesInOneAngle = numFrames / sensativeAngle;
+const sprite = {width: parseInt(image.dataset.width), height: parseInt(image.dataset.height)};
+const imageParams = image.getClientRects()[0];
+const imageHeight = Math.round(imageParams.height);
+const imageWidth = imageParams.width;
+const sizeKoef = imageWidth / sprite.width;
+const adaptedSpriteHeight = sprite.height * sizeKoef;
+const sensativeAngle = 2 * MAX_ANGLE;
+const frameHeight = imageHeight * sizeKoef;
+const numFrames = Math.floor(sprite.height / frameHeight);
+const framesInOneAngle = numFrames / sensativeAngle;
 
 tilt();
 
@@ -23,11 +22,11 @@ function throttledTilt(e) {
 }
 
 function setOffset(value) {
-	$(image).css({'background-position': '0 ' + (-1 * value)  + 'px'});
+	image.style.backgroundPosition = '0 ' + (-1 * value)  + 'px';
 }
 
 function getFloorOffset(opts) {
-	var offset = opts.offset - (opts.offset % imageHeight);
+	const offset = opts.offset - (opts.offset % imageHeight);
 
 	if (offset < 0) {
 		offset = 0;
@@ -46,8 +45,8 @@ function tilt(e) {
 		return;
 	}
 
-	var gamma = e.gamma;
-	var tilt = gamma - this.initialAngle;
+	const gamma = e.gamma;
+	const tilt = gamma - this.initialAngle;
 
 	if (!this.initialAngle) {
 		this.initialAngle = gamma;
@@ -75,8 +74,8 @@ function tilt(e) {
 		return;
 	}
 
-	var offsetDirty = Math.abs(tilt) * framesInOneAngle * frameHeight;
-	var offset = tilt < 0
+	const offsetDirty = Math.abs(tilt) * framesInOneAngle * frameHeight;
+	const offset = tilt < 0
 		? adaptedSpriteHeight / 2 - offsetDirty
 		: adaptedSpriteHeight / 2 + offsetDirty
 	setOffset(getFloorOffset({
