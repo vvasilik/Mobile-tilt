@@ -26,7 +26,7 @@ function setOffset(value) {
 }
 
 function getFloorOffset(opts) {
-	const offset = opts.offset - (opts.offset % imageHeight);
+	let offset = opts.offset - (opts.offset % imageHeight);
 
 	if (offset < 0) {
 		offset = 0;
@@ -44,50 +44,48 @@ function tilt(e) {
 
 		return;
 	}
-
+		
 	const gamma = e.gamma;
 	const tilt = gamma - this.initialAngle;
 
-	if (!this.initialAngle) {
-		this.initialAngle = gamma;
+	switch (true) {
+		case !this.initialAngle:
+			this.initialAngle = gamma;
 
-		setOffset(getFloorOffset({
-			offset: adaptedSpriteHeight / 2
-		}));
-
-		return;
-	}
-
-	if (tilt < 0 && tilt < -MAX_ANGLE) {
-		setOffset(getFloorOffset({
-			offset: 0
-		}));
-
-		return;
-	}
-
-	if (tilt > 0 && tilt > MAX_ANGLE) {
-		setOffset(getFloorOffset({
-			offset: adaptedSpriteHeight
-		}));
-
-		return;
-	}
-
-	const offsetDirty = Math.abs(tilt) * framesInOneAngle * frameHeight;
-	const offset = tilt < 0
-		? adaptedSpriteHeight / 2 - offsetDirty
-		: adaptedSpriteHeight / 2 + offsetDirty
-	setOffset(getFloorOffset({
-		offset: offset
-	}));
+			setOffset(getFloorOffset({
+				offset: adaptedSpriteHeight / 2
+			}));
+	
+			break;
+		case tilt < 0 && tilt < -MAX_ANGLE:
+			setOffset(getFloorOffset({
+				offset: 0
+			}));
+	
+			break;
+		case tilt > 0 && tilt > MAX_ANGLE:
+			setOffset(getFloorOffset({
+				offset: adaptedSpriteHeight
+			}));
+	
+			break;
+		default:
+			const offsetDirty = Math.abs(tilt) * framesInOneAngle * frameHeight;
+			const offset = tilt < 0
+				? adaptedSpriteHeight / 2 - offsetDirty
+				: adaptedSpriteHeight / 2 + offsetDirty
+			setOffset(getFloorOffset({
+				offset: offset
+			}));
+	}	
 }
 
 function debounce(func, wait, immediate) {
 	let timeout;
 
 	return function() {
-		const context = this, args = arguments;
+		const context = this;
+		const args = arguments;
 		const later = function() {
 			timeout = null;
 			if (!immediate) func.apply(context, args);
