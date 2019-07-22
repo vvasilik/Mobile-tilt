@@ -2,7 +2,7 @@ const DEBOUNCE_TIME = 18;
 const MAX_ANGLE = 25;
 
 const image = document.querySelector('.js-image');
-const sprite = {width: parseInt(image.dataset.width), height: parseInt(image.dataset.height)};
+const sprite = { width: parseInt(image.dataset.width), height: parseInt(image.dataset.height) };
 const imageParams = image.getClientRects()[0];
 const imageHeight = Math.round(imageParams.height);
 const imageWidth = imageParams.width;
@@ -12,29 +12,13 @@ const sensativeAngle = 2 * MAX_ANGLE;
 const frameHeight = imageHeight * sizeKoef;
 const numFrames = Math.floor(sprite.height / frameHeight);
 const framesInOneAngle = numFrames / sensativeAngle;
+let currentAngle = 0;
 
-tilt();
+const throttledTilt = debounce(function(e) {
+	tilt(e)
+}, DEBOUNCE_TIME, true);
 
-window.addEventListener('deviceorientation', throttledTilt.bind(this));
-
-function throttledTilt(e) {
-	return debounce(tilt.call(this, e), DEBOUNCE_TIME);
-}
-
-function setOffset(value) {
-	image.style.backgroundPosition = '0 ' + (-1 * value)  + 'px';
-}
-
-function getFloorOffset(opts) {
-	let offset = opts.offset - (opts.offset % imageHeight);
-
-	if (offset < 0) {
-		offset = 0;
-	} else if (offset > adaptedSpriteHeight- imageHeight) {
-		offset = adaptedSpriteHeight - imageHeight
-	}
-	return offset;
-}
+window.addEventListener('deviceorientation', throttledTilt);
 
 function tilt(e) {
 	if (!e) {
@@ -46,11 +30,11 @@ function tilt(e) {
 	}
 		
 	const gamma = e.gamma;
-	const tilt = gamma - this.initialAngle;
+	const tilt = gamma - currentAngle;
 
 	switch (true) {
-		case !this.initialAngle:
-			this.initialAngle = gamma;
+		case !currentAngle:
+			currentAngle = gamma;
 
 			setOffset(getFloorOffset({
 				offset: adaptedSpriteHeight / 2
@@ -78,6 +62,21 @@ function tilt(e) {
 				offset: offset
 			}));
 	}	
+}
+
+function setOffset(value) {
+	image.style.backgroundPosition = '0 ' + (-1 * value)  + 'px';
+}
+
+function getFloorOffset(opts) {
+	let offset = opts.offset - (opts.offset % imageHeight);
+
+	if (offset < 0) {
+		offset = 0;
+	} else if (offset > adaptedSpriteHeight- imageHeight) {
+		offset = adaptedSpriteHeight - imageHeight
+	}
+	return offset;
 }
 
 function debounce(func, wait, immediate) {
